@@ -1,4 +1,7 @@
 name: 定时爬取iplaysoft
+concurrency:
+  group: crawl-job
+  cancel-in-progress: true
 on:
   push:
     branches: [ main ]
