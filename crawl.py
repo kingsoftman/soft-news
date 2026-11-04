@@ -1,23 +1,31 @@
 import json
-from scrapling import Fetcher
+import requests
+from bs4 import BeautifulSoup
 
 OUTPUT = "articles.json"
-fetcher = Fetcher(auto_match=False)
 
 def main():
     items = []
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+    }
     try:
-        url = "https://androidcommunity.com/"
-        page = fetcher.get(url, stealthy=True)
-        article_list = page.css("article h2 a")
-        print(f"✅ 抓到 {len(article_list)} 条资讯")
-        for idx, a in enumerate(article_list[:15]):
+        url = "https://www.bjeea.cn/html/selfstudy/"
+        resp = requests.get(url, headers=headers, timeout=25)
+        resp.raise_for_status()
+        resp.encoding = "utf-8"
+        soup = BeautifulSoup(resp.text, "html.parser")
+        links = soup.select(".list01 li a")
+        print(f"✅ 抓到 {len(links)} 条通知")
+        for idx, a in enumerate(links[:15]):
             title = a.get_text(strip=True)
-            href = a.attrib.get("href")
+            href = a.get("href")
+            if href and not href.startswith("http"):
+                href = "https://www.bjeea.cn" + href
             items.append({
                 "id": idx,
                 "title": title,
-                "category": "安卓资讯",
+                "category": "自考通知",
                 "excerpt": "",
                 "coverSeed": "default",
                 "htmlContent": f"<p>原文地址：{href}</p>"
