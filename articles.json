@@ -80,15 +80,6 @@
       "excerpt": "家里有台吃灰闲置的 Windows 笔记本、NUC、迷你主机或者 Mac mini 吗？放着也是浪费，不如通过 TinyPlay 让它们重新上岗，一秒变成一台客厅电视盒子！",
       "coverSeed": "tinyplay",
       "htmlContent": "<p>家里有台吃灰闲置的 Windows 笔记本、NUC、迷你主机或者 Mac mini 吗？放着也是浪费，不如通过 <strong>TinyPlay</strong> 让它们重新上岗，一秒变成一台<strong>客厅电视盒子</strong>用来看片或投屏吧。</p><h3>TinyPlay 是什么？</h3><p><strong>TinyPlay</strong> 是一款开源免费的影音播放工具，可以把闲置的 Windows 或 macOS 电脑变成一个操作方便的电视盒子，提供私人海报墙媒体库点播（支持本地播放 + SMB、WebDAV）、支持接受投屏等功能！并将你的手机变成电视遥控器。</p><p>你只需在电脑装上 TinyPlay，用 HDMI 连上电视，手机扫个码，整台电脑就成了一个专门放电影、看直播、刷视频的客厅播放器。手机就变成遥控器，选片、拖进度、切字幕、调倍速。</p><h3>核心功能</h3><ul><li><strong>影音库：</strong>支持连接 Emby、Jellyfin、Plex 媒体服务器，海报墙、选集、搜片、续播全都有</li><li><strong>MPV 内核：</strong>支持 MKV、HDR、杜比视界、TrueHD 和 PGS 字幕等常见影音格式</li><li><strong>看 IPTV 直播：</strong>导入 M3U/M3U8 直播源</li><li><strong>接收手机投屏：</strong>自带 DLNA 投屏接收器</li><li><strong>手机当遥控器：</strong>快进快退、拖动进度、切换音轨/字幕、调整倍速</li></ul><h3>和 Kodi 的区别</h3><p><strong>Kodi</strong> 更像一个功能完整、但\"需要深度定制\"的家庭媒体中心，配置和学习成本更高。而 <strong>TinyPlay</strong> 更适合\"快速将电脑接入到电视、只想便捷看片\"的场景——轻量、开箱即用、用手机浏览器当遥控器。</p><h3>总结</h3><p><strong>TinyPlay</strong> 不会让一台老电脑性能变强，但能将吃灰闲置设备利用起来！它解决了\"电脑接电视、操作靠键鼠\"的别扭，影视点播体验做到更像电视盒子。</p>"
-    },
-    {
-      "id": 10,
-      "title": "编辑OpenCut 开源版\"剪映\"替代品 - 免费无水印视频剪辑",
-      "category": "多媒体类",
-      "date": "2026-09-07",
-      "excerpt": "视频剪辑本来应该是件挺有趣的事，结果这两年硬是被各种会员付费整出了火气。开源版的 OpenCut 完全免费、无水印、不用登录，视频处理全在本地完成！",
-      "coverSeed": "opencut",
-      "htmlContent": "<p>视频剪辑本来应该是件挺有趣的事，结果这两年硬是被各种会员付费整出了火气。下载了剪映、PR 之类的工具，想加个转场要会员；想导个高清要会员；连自动字幕都开始限次数。</p><p>而开源版的 <strong>OpenCut</strong> 完全免费、无水印、不用登录，视频处理全在本地完成，甚至免安装只需浏览器就能剪视频。</p><h3>OpenCut 是什么？</h3><p>OpenCut 被誉为轻量级<strong>开源的\"剪映\"</strong>替代品。它是一款完全免费、跨平台的视频剪辑编辑器，个人用、商用、二次修改都免费无限制，没有会员、没有水印、没有广告，也不用注册登录。你可以<strong>直接在浏览器里打开就用，不用下载安装几 GB 的客户端</strong>。</p><h3>核心功能</h3><ul><li><strong>多轨时间线：</strong>视频、音频、文字、贴纸分层摆放，支持拖动、缩放、批量选择</li><li><strong>关键帧动画：</strong>位置、缩放、旋转、透明度都能打关键帧，带贝塞尔曲线编辑器</li><li><strong>字幕与画布：</strong>能导入字幕文件生成字幕，画布尺寸随意设</li><li><strong>实时预览加磁吸对齐</strong>，快捷键优先，针对竖屏 9:16 的布局预设</li><li><strong>导出一键套用平台尺寸：</strong>YouTube 1080p/4K、TikTok 竖屏、Instagram 正方形</li></ul><h3>对比</h3><table border=\"1\" cellpadding=\"8\" style=\"border-collapse:collapse;width:100%\"><tr><th>特性</th><th>OpenCut</th><th>剪映</th><th>Premiere</th></tr><tr><td>价格</td><td>免费 (MIT 开源)</td><td>部分功能收费</td><td>订阅制</td></tr><tr><td>导出水印</td><td>无水印</td><td>免费版带水印</td><td>无水印</td></tr><tr><td>素材存放</td><td>全部本地</td><td>依赖云端</td><td>本地</td></tr><tr><td>是否开源</td><td>是</td><td>否</td><td>否</td></tr><tr><td>上手门槛</td><td>低</td><td>低</td><td>高</td></tr></table><h3>总结</h3><p><strong>OpenCut</strong> 最大的价值，不是说今天就能把剪映/PR 换掉，而是证明了基础剪辑工具完全可以更开放、更尊重用户。如果你今天就需要一个免费的剪映替代品，实现简单基础的剪辑功能，那么使用 OpenCut 就能体验！</p>"
     }
   ]
 }
