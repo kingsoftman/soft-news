@@ -10,22 +10,22 @@ def main():
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
     }
     try:
-        url = "https://www.bjeea.cn/html/selfstudy/"
+        url = "https://www.chinanews.com.cn/gn/news_list.shtml"
         resp = requests.get(url, headers=headers, timeout=25)
         resp.raise_for_status()
         resp.encoding = "utf-8"
         soup = BeautifulSoup(resp.text, "html.parser")
-        links = soup.select(".list01 li a")
-        print(f"✅ 抓到 {len(links)} 条通知")
+        links = soup.select(".dd_lm li a")
+        print(f"✅ 抓到 {len(links)} 条新闻")
         for idx, a in enumerate(links[:15]):
             title = a.get_text(strip=True)
             href = a.get("href")
             if href and not href.startswith("http"):
-                href = "https://www.bjeea.cn" + href
+                href = "https://www.chinanews.com.cn" + href
             items.append({
                 "id": idx,
                 "title": title,
-                "category": "自考通知",
+                "category": "国内新闻",
                 "excerpt": "",
                 "coverSeed": "default",
                 "htmlContent": f"<p>原文地址：{href}</p>"
