@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>极安资讯 - 后台编辑</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f5f5f7;
+    padding-bottom: 80px;
+}
+.header {
+    background: linear-gradient(135deg, #7c4dff, #651fff);
+    color: white;
+    padding: 20px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+.header h1 { font-size: 18px; font-weight: 600; }
+.header p { font-size: 12px; opacity: 0.8; margin-top: 4px; }
+.container { padding: 16px; }
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.card h2 { font-size: 16px; margin-bottom: 12px; color: #333; }
+input, textarea, select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 15px;
+    margin-bottom: 12px;
+    font-family: inherit;
+}
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: #7c4dff;
+}
+textarea { min-height: 200px; resize: vertical; }
+.btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 24px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 8px;
+}
+.btn-primary {
+    background: linear-gradient(135deg, #7c4dff, #651fff);
+    color: white;
+}
+.btn-secondary {
+    background: #f0f0f5;
+    color: #333;
+}
+.btn:active { opacity: 0.8; }
+.article-item {
+    padding: 12px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.article-item:last-child { border-bottom: none; }
+.article-title { font-size: 14px; color: #333; flex: 1; margin-right: 12px; }
+.article-date { font-size: 12px; color: #999; }
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: #999;
+}
+.toast {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 16px 24px;
+    border-radius: 12px;
+    font-size: 14px;
+    z-index: 999;
+    display: none;
+}
+.form-group { margin-bottom: 12px; }
+.form-group label { font-size: 13px; color: #666; display: block; margin-bottom: 6px; }
+.tabs {
+    display: flex;
+    background: white;
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 16px;
+}
+.tab {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #666;
+    cursor: pointer;
+}
+.tab.active {
+    background: #7c4dff;
+    color: white;
+}
+.page { display: none; }
+.page.active { display: block; }
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>极安资讯 · 后台管理</h1>
+    <p>手机端文章编辑器 · v6</p>
+</div>
+
+<div class="container">
+    <!-- Token设置 -->
+    <div class="card" id="tokenCard">
+        <h2>GitHub Token 设置</h2>
+        <p style="font-size:13px;color:#666;margin-bottom:12px;">
+            第一次使用需要输入你的GitHub Personal Access Token。<br>
+            生成方法：GitHub → Settings → Developer settings → Personal access tokens → Generate new token，勾选 repo 权限。
+        </p>
+        <input type="password" id="tokenInput" placeholder="粘贴你的GitHub Token">
+        <button class="btn btn-primary" onclick="saveToken()">保存Token</button>
+    </div>
+
+    <!-- 标签页 -->
+    <div class="tabs" id="tabs" style="display:none;">
+        <div class="tab active" onclick="showPage('list')">文章列表</div>
+        <div class="tab" onclick="showPage('add')">添加文章</div>
+    </div>
+
+    <!-- 文章列表页 -->
+    <div class="page active" id="listPage">
+        <div class="card">
+            <div id="articleList">
+                <div class="loading">加载中...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加文章页 -->
+    <div class="page" id="addPage">
+        <div class="card">
+            <h2>添加新文章</h2>
+            <div class="form-group">
+                <label>文章标题</label>
+                <input type="text" id="titleInput" placeholder="输入文章标题">
+            </div>
+            <div class="form-group">
+                <label>分类</label>
+                <select id="categoryInput">
+                    <option value="文档办公">文档办公</option>
+                    <option value="手机数码">手机数码</option>
+                    <option value="系统工具">系统工具</option>
+                    <option value="网络软件">网络软件</option>
+                    <option value="优化辅助">优化辅助</option>
+                    <option value="设计美化">设计美化</option>
+                    <option value="多媒体类">多媒体类</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>日期</label>
+                <input type="date" id="dateInput">
+            </div>
+            <div class="form-group">
+                <label>摘要</label>
+                <input type="text" id="excerptInput" placeholder="一句话摘要，显示在列表页">
+            </div>
+            <div class="form-group">
+                <label>封面标识</label>
+                <input type="text" id="coverInput" placeholder="如：myapp">
+            </div>
+            <div class="form-group">
+                <label>正文HTML</label>
+                <textarea id="contentInput" placeholder="输入文章正文，支持HTML标签&lt;p&gt;&lt;h3&gt;&lt;ul&gt;&lt;li&gt;等"></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="addArticle()">发布文章</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const REPO_OWNER = 'kingsoftman';
+const REPO_NAME = 'soft-news';
+const FILE_PATH = 'articles.json';
+
+let token = localStorage.getItem('github_token') || '';
+let articles = [];
+
+// 初始化
+window.onload = function() {
+    if (token) {
+        document.getElementById('tokenCard').style.display = 'none';
+        document.getElementById('tabs').style.display = 'flex';
+        loadArticles();
+    }
+    // 默认日期
+    document.getElementById('dateInput').value = new Date().toISOString().split('T')[0];
+};
+
+function saveToken() {
+    const t = document.getElementById('tokenInput').value.trim();
+    if (!t) { showToast('请输入Token'); return; }
+    token = t;
+    localStorage.setItem('github_token', t);
+    document.getElementById('tokenCard').style.display = 'none';
+    document.getElementById('tabs').style.display = 'flex';
+    loadArticles();
+    showToast('Token保存成功');
+}
+
+function showPage(page) {
+    document.querySelectorAll('.tab').forEach((t, i) => {
+        t.classList.toggle('active', (i === 0 && page === 'list') || (i === 1 && page === 'add'));
+    });
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(page + 'Page').classList.add('active');
+}
+
+async function loadArticles() {
+    try {
+        // 直接加载JSON文件，不用走API
+        const resp = await fetch(`https://${REPO_OWNER}.github.io/${REPO_NAME}/${FILE_PATH}`);
+        const json = await resp.json();
+        articles = json.articles || [];
+        renderArticleList();
+    } catch (e) {
+        document.getElementById('articleList').innerHTML = '<div class="loading">加载失败: ' + e.message + '</div>';
+    }
+}
+
+function renderArticleList() {
+    const listEl = document.getElementById('articleList');
+    if (articles.length === 0) {
+        listEl.innerHTML = '<div class="loading">暂无文章</div>';
+        return;
+    }
+    const reversed = [...articles].reverse();
+    listEl.innerHTML = reversed.map(a => `
+        <div class="article-item">
+            <div style="flex:1;">
+                <div class="article-title">${a.title}</div>
+                <div class="article-date">${a.category} · ${a.date}</div>
+            </div>
+            <div style="display:flex;gap:8px;">
+                <button onclick="editArticle(${a.id})" style="padding:6px 12px;border:none;border-radius:6px;background:#f0f0f5;color:#666;font-size:12px;">编辑</button>
+                <button onclick="deleteArticle(${a.id})" style="padding:6px 12px;border:none;border-radius:6px;background:#ff4444;color:white;font-size:12px;">删除</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+let editingId = null;
+
+function editArticle(id) {
+    const article = articles.find(a => a.id === id);
+    if (!article) return;
+    editingId = id;
+    document.getElementById('titleInput').value = article.title;
+    document.getElementById('categoryInput').value = article.category;
+    document.getElementById('dateInput').value = article.date;
+    document.getElementById('excerptInput').value = article.excerpt;
+    document.getElementById('coverInput').value = article.coverSeed;
+    document.getElementById('contentInput').value = article.htmlContent;
+    document.querySelector('#addPage h2').textContent = '编辑文章';
+    showPage('add');
+}
+
+async function deleteArticle(id) {
+    if (!confirm('确定要删除这篇文章吗？')) return;
+    articles = articles.filter(a => a.id !== id);
+    await commitChanges('删除文章');
+}
+
+async function commitChanges(message) {
+    try {
+        showToast('正在提交...');
+        const resp = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`, {
+            headers: { 'Authorization': `token ${token}` }
+        });
+        const fileData = await resp.json();
+        const sha = fileData.sha;
+        const newContent = JSON.stringify({ articles: articles }, null, 2);
+        const encoded = btoa(unescape(encodeURIComponent(newContent)));
+        const updateResp = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message: message,
+                content: encoded,
+                sha: sha
+            })
+        });
+        if (updateResp.ok) {
+            showToast('操作成功！');
+            editingId = null;
+            document.querySelector('#addPage h2').textContent = '添加新文章';
+            showPage('list');
+            loadArticles();
+        } else {
+            const err = await updateResp.json();
+            showToast('操作失败: ' + err.message);
+        }
+    } catch (e) {
+        showToast('错误: ' + e.message);
+    }
+}
+
+async function addArticle() {
+    const title = document.getElementById('titleInput').value.trim();
+    const category = document.getElementById('categoryInput').value;
+    const date = document.getElementById('dateInput').value;
+    const excerpt = document.getElementById('excerptInput').value.trim();
+    const coverSeed = document.getElementById('coverInput').value.trim() || 'default';
+    const htmlContent = document.getElementById('contentInput').value.trim();
+
+    if (!title || !htmlContent) {
+        showToast('请填写标题和正文');
+        return;
+    }
+
+    if (editingId !== null) {
+        // 编辑模式：更新现有文章
+        const index = articles.findIndex(a => a.id === editingId);
+        if (index >= 0) {
+            articles[index] = {
+                id: editingId,
+                title: title,
+                category: category,
+                date: date,
+                excerpt: excerpt,
+                coverSeed: coverSeed,
+                htmlContent: htmlContent
+            };
+        }
+        await commitChanges('更新文章: ' + title);
+    } else {
+        // 添加模式：新建文章
+        const newId = articles.length > 0 ? Math.max(...articles.map(a => a.id)) + 1 : 1;
+        const newArticle = {
+            id: newId,
+            title: title,
+            category: category,
+            date: date,
+            excerpt: excerpt,
+            coverSeed: coverSeed,
+            htmlContent: htmlContent
+        };
+        articles.push(newArticle);
+        await commitChanges('添加文章: ' + title);
+    }
+
+    // 清空表单
+    document.getElementById('titleInput').value = '';
+    document.getElementById('excerptInput').value = '';
+    document.getElementById('coverInput').value = '';
+    document.getElementById('contentInput').value = '';
+}
+
+function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.style.display = 'block';
+    setTimeout(() => { toast.style.display = 'none'; }, 2000);
+}
+</script>
+
+</body>
+</html>
