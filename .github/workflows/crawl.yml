@@ -33,17 +33,18 @@ jobs:
       - name: 执行爬虫脚本
         run: python crawl.py
 
-      - name: 判断并提交更新
+      - name: 提交更新
         run: |
-          set +e
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git checkout main
-          git pull origin main
-          if git diff --quiet articles.json; then
-            echo "✅ 无新内容，跳过提交"
+          # 先判断文件有没有改动
+          CHANGED=$(git diff --quiet articles.json; echo $?)
+          if [ $CHANGED -eq 0 ]; then
+            echo "✅ 无更新，直接退出"
             exit 0
           fi
+          git pull origin main
           git add articles.json
           git commit -m "🤖 自动更新 articles.json"
           git push origin main
