@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>极安资讯 - 精选软件推荐</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; background: #f5f5f7; color: #1d1d1f; line-height: 1.6; }
+.header { background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: #fff; padding: 40px 20px; text-align: center; }
+.header h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+.header p { opacity: 0.9; font-size: 14px; }
+.container { max-width: 900px; margin: 0 auto; padding: 20px; }
+.article-list { display: grid; gap: 20px; }
+.article-card { background: #fff; border-radius: 16px; overflow: hidden; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+.article-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+.article-card img { width: 100%; height: 200px; object-fit: cover; }
+.article-card-body { padding: 20px; }
+.article-card .category { display: inline-block; background: #6c5ce7; color: #fff; font-size: 12px; padding: 3px 10px; border-radius: 20px; margin-bottom: 10px; }
+.article-card h2 { font-size: 18px; font-weight: 600; margin-bottom: 8px; line-height: 1.4; }
+.article-card .excerpt { font-size: 14px; color: #666; line-height: 1.6; }
+.article-card .meta { margin-top: 12px; font-size: 12px; color: #999; }
+
+/* 详情页 */
+.detail-page { display: none; }
+.detail-page.active { display: block; }
+.list-page.hidden { display: none; }
+.back-btn { display: inline-flex; align-items: center; gap: 6px; background: #fff; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-size: 14px; color: #6c5ce7; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.back-btn:hover { background: #f0f0f5; }
+.detail-hero { width: 100%; height: 300px; object-fit: cover; border-radius: 16px; margin-bottom: 24px; }
+.detail-content { background: #fff; border-radius: 16px; padding: 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+.detail-content h1 { font-size: 26px; margin-bottom: 12px; line-height: 1.3; }
+.detail-content .meta { font-size: 13px; color: #999; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #eee; }
+.detail-content .body { font-size: 15px; line-height: 1.8; color: #333; }
+.detail-content .body h3 { margin: 24px 0 12px; font-size: 18px; color: #1d1d1f; }
+.detail-content .body p { margin-bottom: 16px; }
+.detail-content .body ul { margin: 12px 0 16px 24px; }
+.detail-content .body li { margin-bottom: 8px; }
+.detail-content .body code { background: #f5f5f7; padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+.detail-content .body strong { color: #1d1d1f; }
+.detail-content .body table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
+.detail-content .body th, .detail-content .body td { border: 1px solid #e0e0e0; padding: 8px 12px; text-align: left; }
+.detail-content .body th { background: #f5f5f7; }
+
+@media (max-width: 600px) {
+  .header { padding: 24px 16px; }
+  .header h1 { font-size: 22px; }
+  .container { padding: 12px; }
+  .article-card img { height: 160px; }
+  .detail-content { padding: 20px; }
+  .detail-content h1 { font-size: 20px; }
+  .detail-hero { height: 200px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>极安资讯</h1>
+  <p>精选优质软件 · 免费开源 · 效率工具</p>
+</div>
+
+<div class="container">
+  <!-- 列表页 -->
+  <div class="list-page" id="listPage">
+    <div class="article-list" id="articleList"></div>
+  </div>
+
+  <!-- 详情页 -->
+  <div class="detail-page" id="detailPage">
+    <button class="back-btn" onclick="goBack()">← 返回列表</button>
+    <img class="detail-hero" id="detailHero" src="" alt="">
+    <div class="detail-content">
+      <h1 id="detailTitle"></h1>
+      <div class="meta" id="detailMeta"></div>
+      <div class="body" id="detailBody"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+let articles = [];
+
+// 从远程加载文章数据
+async function loadArticles() {
+  try {
+    const resp = await fetch('https://kingsoftman.github.io/soft-news/articles.json');
+    const json = await resp.json();
+    articles = json.articles || [];
+    // 生成封面图
+    articles.forEach(a => {
+      a.image = `https://picsum.photos/seed/${a.coverSeed}/800/400`;
+      a.content = a.htmlContent;
+    });
+    renderList();
+  } catch (e) {
+    document.getElementById('articleList').innerHTML = '<p style="text-align:center;color:#999;padding:40px;">加载失败，请刷新重试</p>';
+  }
+}
+
+/* 旧的硬编码数据，已注释掉
+const articles_old = [
+  {
+    id: 1,
+    title: "MarkText - 开源轻量流畅极简的 Markdown 编辑器 (免费 Typora 平替)",
+    category: "文档办公",
+    date: "2026-10-30",
+    excerpt: "让 Markdown 成为了真正意义上的排版格式之王。一个好用的 Markdown 写作和阅读工具，几乎是所有人都需要的。而开源免费轻量的 MarkText 正是填补了\"免费版 Typora\"替代品的空缺……",
+    image: "https://picsum.photos/seed/marktext/800/400",
+    content: `<p>让 <strong>Markdown</strong> 成为了真正意义上的排版格式之王。一个好用的 Markdown 写作和阅读工具，几乎是所有人都需要的。</p>
+<h3>为什么说 MarkText 是写作者的利器？</h3>
+<p><strong>MarkText</strong> 是一个专注于让你\"写得舒服\"的 Markdown 编辑器，它与 Typora 定位相似：简单、优雅、不打扰。重点是，它完全免费开源，修补了很多 MD 编辑器在处理中文输入时的那些\"反人类\"小毛病！软件跨平台支持 Windows、Mac、Linux。</p>
+<ul>
+<li><strong>真正的所见即所得：</strong>不需要配置分屏，写标题就是标题，加粗就是加粗，所见即你最终呈现出的样子。</li>
+<li><strong>三种专注模式：</strong>源码模式、打字机模式和专注模式。打字机模式让当前编辑的行始终保持在屏幕中央。</li>
+<li><strong>中文体验友好：</strong>针对中文写作的边界解析做了专门优化，写起中文来相当顺滑。</li>
+</ul>
+<h3>MarkText 的实用功能</h3>
+<ul>
+<li><strong>无缝兼容：</strong>完整支持 CommonMark 规范和 GitHub 风格语法，代码高亮、数学公式 (KaTeX)、流程图 (Mermaid) 全部支持。</li>
+<li><strong>极简操作：</strong>支持从剪贴板直接粘贴图片，截图之后 Ctrl + V 就进去了。</li>
+<li><strong>多格式导出：</strong>写完之后可以直接导出为 HTML 或 PDF。</li>
+<li><strong>高度可定制：</strong>内置了 30 多套精美主题。</li>
+</ul>
+<h3>总结</h3>
+<p><strong>MarkText</strong> 没有 Obsidian 那些复杂的双链插件，也没有 Notion 那样的在线协作功能，但它把\"写作\"这一件事做到了简单、极致。如果你只是单纯想要一个打开就能写、界面优雅、无需付费且开源的本地编辑器，MarkText 真的非常值得一试。</p>`
+  },
+  {
+    id: 2,
+    title: "Scrcpy 5 - 开源免费在电脑显示手机画面并控制安卓手机工具",
+    category: "手机数码",
+    date: "2026-10-13",
+    excerpt: "新版支持 GPU 加速。Scrcpy 正是一款开源免费\"通用\"且功能却更强大的安卓手机屏幕画面投屏+控制软件！它跨平台支持 Win、Mac、Linux……",
+    image: "https://picsum.photos/seed/scrcpy/800/400",
+    content: `<p>如果想在电脑上使用 Android 应用/玩游戏，除了用安卓模拟器外，也可借助类似工具将手机画面投屏到电脑上显示和控制。并非所有品牌都提供投屏功能，<strong>Scrcpy</strong> 正是一款开源免费\"通用\"且功能强大的安卓手机屏幕画面投屏+控制软件！</p>
+<h3>Scrcpy 是什么？</h3>
+<p><strong>Scrcpy</strong> 可以视为开源免费支持通用品牌的强大安卓手机投屏控制软件，能将安卓手机的画面投屏到电脑桌面显示上并进行操控。它支持 WiFi 无线和 USB 数据线连接，支持鼠标控制、键盘输入、电脑剪切板复制粘贴、拖放文件传输到手机、以及拖放 APK 文件进行安装。</p>
+<p>Scrcpy v5.0 新版本的重点更新是全面引入了显卡 GPU 硬件解码支持，不仅能降低 10 倍以上的 CPU 占用，并能显著减少画面延迟，还加入了对 Windows ARM64 设备的原生支持。</p>
+<h3>常用快捷键</h3>
+<table>
+<tr><th>功能</th><th>快捷键</th></tr>
+<tr><td>切换全屏模式</td><td>Ctrl+F</td></tr>
+<tr><td>将窗口调整为1:1</td><td>Ctrl+G</td></tr>
+<tr><td>设备 BACK 键</td><td>Ctrl+B</td></tr>
+<tr><td>设备任务管理键</td><td>Ctrl+S</td></tr>
+<tr><td>设备菜单键</td><td>Ctrl+M</td></tr>
+<tr><td>设备电源键</td><td>Ctrl+P</td></tr>
+<tr><td>点亮手机屏幕</td><td>鼠标右键</td></tr>
+<tr><td>复制内容到设备</td><td>Ctrl+V</td></tr>
+</table>
+<h3>WiFi 无线连接</h3>
+<p>前提是手机和电脑处于同一局域网：</p>
+<ul>
+<li>查询设备 IP 地址</li>
+<li>执行 <code>adb tcpip 5555</code></li>
+<li>拔掉数据线</li>
+<li>执行 <code>adb connect 设备IP:5555</code></li>
+<li>重新启动 scrcpy 即可</li>
+</ul>
+<h3>总结</h3>
+<p>个人感觉 <strong>Scrcpy</strong> 用来办公真的很方便，可以在电脑前轻松处理手机端的事情。再加上 Scrcpy 完全免费开源，支持跨平台，支持录屏，而且是独立的程序。非常值得推荐。</p>`
+  },
+  {
+    id: 3,
+    title: "Obsidian - 完美契合 AI 时代的免费笔记软件",
+    category: "文档办公",
+    date: "2026-07-28",
+    excerpt: "笔记软件终结者？自从 AI 真正进入日常工作流后，「笔记软件」这赛道已悄悄被重新洗牌了！站在牌桌中间的，居然是一个发布自 2020 年的低调朴素不花哨的工具 Obsidian……",
+    image: "https://picsum.photos/seed/obsidian/800/400",
+    content: `<p>以前我也觉得，笔记软件不就那回事吗？能记、能搜索、能同步，差不多就行。Notion、思源笔记、印象笔记、有道云、OneNote，基本都轮了一圈，结果总是这样或那样的失望……</p>
+<p>存了一大堆笔记，用的时候不是找不到，就是资料太多太乱人工难以整理；而想换工具，导出功能各种限制；好不容易养成习惯，平台一改规则又得重来。加上 AI 时代彻底变革，在经历反复横跳后，我最终决定把免费的 <strong>Obsidian</strong> 当成主力工具。</p>
+<h3>Obsidian 是什么？</h3>
+<p><strong>Obsidian</strong> (黑曜石) 是一款免费的「本地存储 Markdown 文件的笔记软件 / 知识库管理器」。个人使用完全免费，跨平台支持 Windows、macOS、Linux、iOS、Android，拥有极其丰富的插件生态，你甚至都不用注册账号就能使用。</p>
+<p>Obsidian 的知识库叫「Vault」，本质上就是你电脑里的一个普通文件夹。里面保存的笔记就是一个个 <code>.md</code> 文件，同时图片、PDF 等附件也跟着放在本地。</p>
+<h3>它能解决的问题</h3>
+<ul>
+<li>云端笔记数据全部由厂商掌握，导出难、迁移痛、数据不在自己手里</li>
+<li>不依靠工具手工管理一大堆 .md / .txt 本地文件，会非常难以组织、整理和搜索</li>
+<li>几乎所有笔记软件的 AI 功能都是会员付费项，而 OB 把数据交还给你，你可以运用任何 AI 对它们进行加工处理</li>
+<li>需要把灵感、资料、项目、复盘慢慢沉淀成可复用的知识资产</li>
+</ul>
+<h3>双向链接</h3>
+<p>除了最简单的单个 Markdown 笔记编辑外，Obsidian 最大的特色是支持笔记之间的\"链接\"。并且它还支持\"双向链接\"。用 <code>[[笔记名]]</code> 做双向链接，笔记之间能连成网。A 提到 B，B 那边会自动出现反向链接到 A。</p>
+<h3>总结</h3>
+<p>挑笔记软件，挑的从来不是功能最多的那个，而是你最容易带着走、也最愿意长期写下去、并且能帮你积累沉淀下来的那个。<strong>Obsidian</strong> 吸引我的点，从来不是它最时髦，而是它足够克制，又足够灵活：用本地文件保存内容，用 Markdown 保持开放，用双链表达关系，用插件和 AI 放大能力。</p>`
+  },
+  {
+    id: 4,
+    title: "Windows 11 26H2 最新官方正式版 ISO 镜像下载",
+    category: "系统工具",
+    date: "2026-10-02",
+    excerpt: "重磅 26H2 2026 更新！微软终于也更新了其最新一代的操作系统——Windows 11 2026 正式版了！并且微软还很厚道地宣布「Win11 可从 Win7/8/10 完全免费升级」……",
+    image: "https://picsum.photos/seed/win11/800/400",
+    content: `<p>最近苹果发布了新版 macOS 系统之后，<strong>微软</strong>终于也更新了其最新一代的操作系统——<strong>Windows 11 2026 正式版</strong>了！并且微软还很厚道地宣布「<strong>Win11 可从 Win7/8/10 完全免费升级</strong>」。</p>
+<h3>26H2 新功能汇总</h3>
+<ul>
+<li><strong>任务栏位置自由调整：</strong>支持将任务栏放在屏幕底部、顶部、左侧或右侧</li>
+<li><strong>任务栏紧凑模式：</strong>新增小图标模式，缩小任务栏高度和图标尺寸</li>
+<li><strong>开始菜单模块化：</strong>可独立开启/关闭「固定/最近/所有应用」三区域</li>
+<li><strong>运行对话框现代化：</strong>Win+R 界面基于 WinUI 重构，新增历史命令记录</li>
+<li><strong>搜索纯净化：</strong>新增一键关闭 Web 搜索和 Microsoft Store 建议选项</li>
+<li><strong>AI 深度嵌入系统：</strong>设置中的 Agent 助手支持自然语言查找选项</li>
+<li><strong>任务管理器新增 NPU 监控：</strong>实时查看 NPU 使用率、专用内存占用</li>
+<li><strong>系统更新重启次数大幅减少：</strong>目标每月只需重启 1 次</li>
+</ul>
+<h3>解决 TPM 2.0 限制</h3>
+<p>方法 1（推荐）：使用 Rufus、Ventoy 等工具新版本制作启动盘，直接\"破解\"跳过 TPM 2.0 和 SecureBoot 限制。</p>
+<p>方法 2：安装时按 <code>Shift+F10</code> 打开命令行，执行：</p>
+<p><code>REG ADD HKLM\SYSTEM\Setup\LabConfig /v BypassTPMCheck /t REG_DWORD /d 1</code><br>
+<code>REG ADD HKLM\SYSTEM\Setup\LabConfig /v BypassSecureBootCheck /t REG_DWORD /d 1</code></p>
+<h3>镜像信息</h3>
+<ul>
+<li>文件：zh-cn_windows_11_business_editions_version_26h2_x64_dvd_74d48a06.iso</li>
+<li>大小：8.38GB</li>
+<li>SHA256：63FC3D2497F891D64946CB1E9A50C87FE24C605984712391C3441E2F78BC0EB5</li>
+</ul>`
+  },
+  {
+    id: 5,
+    title: "Windows 11 ARM 系统原版 ISO 镜像下载 - 支持苹果 M 芯片 Mac",
+    category: "系统工具",
+    date: "2026-09-29",
+    excerpt: "重磅 26H2 更新！苹果在新款 Mac 电脑上推出了 Apple M 系列自研芯片处理器，出色的性能和功耗使其大获成功！然而苹果芯片采用的 ARM 架构与以往常用的 X86 架构软件并不兼容……",
+    image: "https://picsum.photos/seed/winarm/800/400",
+    content: `<p>苹果在新款的 <strong>Mac 电脑</strong>上推出了 <strong>Apple M</strong> 系列自研芯片处理器，出色的性能和功耗使其大获成功！然而苹果芯片采用的 ARM 架构与以往常用的 X86 / X64 架构软件并不兼容。</p>
+<p>想要在苹果芯片的 <strong>Mac</strong> 上安装 Windows，除了需要最新版的 <strong>Parallels Desktop 虚拟机</strong>外，还必须下载 <strong>Windows ARM 架构版本镜像</strong>！目前微软已发布 <strong>Windows 11 ARM</strong> 正式版的 ISO 镜像了。</p>
+<h3>向下兼容能力</h3>
+<p>微软也为 <strong>Windows 11 ARM</strong> 做了非常全面的向下兼容能力，能在 ARM 系统上直接运行传统的 32 位 (x86) 和 64 位 (x64) 的 Windows (.exe) 应用程序。不仅兼容性好，性能上也没明显损失，用户使用时完全无感知。</p>
+<p>这点与苹果的 M 系列芯片 Mac 通过\"Rosetta\"转译技术兼容运行过去的 Intel 架构应用一样，Windows ARM 系统同样可以直接向下兼容，而无需任何额外的操作。</p>
+<h3>PD 虚拟机安装</h3>
+<p>通过最新版的 Parallels Desktop 虚拟机，我们终于可以在 macOS 上安装和流畅地运行 ARM 版本的 Windows 11 了。实测下来使用几乎没有任何问题，所有常见的应用程序，比如 Office、Chrome、IDM、Edge 浏览器、VSCode、QQ、微信等都能顺利成功运行。</p>
+<h3>总结</h3>
+<p>目前在苹果自研 M 系列芯片的 Mac 上使用 Windows 系统和软件应用的最佳方式就是使用 Parallels Desktop 虚拟机安装 Windows 11 ARM 了。随着 ARM 版 Windows 11 的不断完善以及兼容性的提高，日后无论是 ARM 的 PC 电脑、树莓派、手机等硬件，还是 Mac 通过虚拟机安装 Windows，玩法都会越来越多。</p>`
+  },
+  {
+    id: 6,
+    title: "Konode - 开源浏览器同步工具！跨 Chrome/Edge/Firefox 同步书签",
+    category: "网络软件",
+    date: "2026-10-13",
+    excerpt: "同时用 Chrome、Edge、Firefox 的人应该都懂这种折磨：书签各存各的，历史各记各的，标签页更是灾难现场。公司电脑 Chrome 打开过的网页，回到家打开 Edge 一个都找不到……",
+    image: "https://picsum.photos/seed/konode/800/400",
+    content: `<p>同时用 <strong>Chrome</strong>、<strong>Edge</strong>、<strong>Firefox</strong> 的人应该都懂这种折磨：书签各存各的，历史各记各的，标签页更是灾难现场。公司电脑 Chrome 打开过或收藏过的网页，回到家打开 Edge 一个都找不到。</p>
+<h3>Konode 是什么？</h3>
+<p>Konode 是一款<strong>开源</strong>免费的浏览器数据同步扩展，<strong>可以让 Chrome 免魔法走自建私有同步！无需谷歌账号，国内无障碍直接同步</strong>。同时，它还支持所有 Chromium 系浏览器以及 Firefox 系的同步。</p>
+<p>也就是说，Konode 不仅支持同一种浏览器跨设备同步，它还<strong>可以在 Chrome 和 Firefox 之间跨内核互相同步</strong>，这是任何一家官方自带同步都做不到的事。</p>
+<h3>能同步什么？</h3>
+<ul>
+<li><strong>书签 / 收藏夹：</strong>会保留完整的文件夹层级和嵌套结构，增删改、移动、重排都能双向同步</li>
+<li><strong>标签页：</strong>以\"会话快照\"的形式保存，换设备一键恢复</li>
+<li><strong>历史记录：</strong>会去重合并，任意设备上都能搜到全部浏览记录</li>
+<li><strong>扩展列表：</strong>只同步清单，方便新机器核对缺了哪些扩展</li>
+</ul>
+<h3>数据保存在自己手里</h3>
+<p>Konode 不提供云存储、不需要注册账号、数据不流经中间服务器。扩展只做管道，数据直接写进你指定的存储，比如在你自己 VPS 服务器上自建私有 WebDAV，或使用 Koofr、坚果云等支持 WebDAV 的网盘。</p>
+<p>开启 AES-256-GCM 端到端加密后，存到网盘里的就是密文。就算你不小心把 GitHub 仓库设成了公开，别人拿到的也只是一堆密文。</p>
+<h3>总结</h3>
+<p>如果你同时用多个不同浏览器，需要同步数据；或者公司、家里多台电脑需要跨设备同步，并且想要将收藏夹、标签页、浏览记录甚至扩展插件都同步，那么 Konode 是绝佳选择。</p>`
+  },
+  {
+    id: 7,
+    title: "PopDrop 一键弹出\"文件面板\"！快捷常用文件随用随到",
+    category: "优化辅助",
+    date: "2026-09-29",
+    excerpt: "需要给同事发送刚下载的文件，听起来似乎是 10 秒的事，做起来却往往花上 1 分钟：切换窗口、找到下载目录、一层层点进去找……PopDrop 就是来把这连串操作给\"砍短\"的！",
+    image: "https://picsum.photos/seed/popdrop/800/400",
+    content: `<p>需要给同事发送刚下载的文件，听起来似乎是 10 秒的事，做起来却往往花上 1 分钟：切换窗口、找到下载目录、一层层点进去找，在大量文件和之间辨认半天。每天如此，烦是真的烦。</p>
+<p><strong>PopDrop</strong> 就是来把这连串操作给\"砍短\"的！你只需按下 <code>F2</code>，立马呼出一块置顶面板盖在当前窗口上，你常用的目录全摊开，最新文件排在最前面，找到后直接拖进聊天框，松手就搞定！</p>
+<h3>F2 呼出面板</h3>
+<p>把下载、桌面、文档和项目目录等最常用的文件夹加进 PopDrop 后，每个文件夹独立分栏，新文件和最近修改的自动排前面。按 F2 呼出，看中哪个直接往微信、飞书、邮件、AI 编辑器里拖，拖完面板自动收起。</p>
+<h3>固定项</h3>
+<p>那些经常要反复查看、修改、发送的文件，比如某些模板、报价单、每月报表、常用素材等，可以直接拖进\"固定项\"。下次按 F2 就能直接拿到，不用再翻文件夹。</p>
+<h3>常用文字、提示词</h3>
+<p>PopDrop 2.0 版本新增的<strong>文本块工作区</strong>把 .md 和 .txt 等纯文本平铺成卡片。常见的 AI 提示词、常用回复、命令片段、写作模板全放这里。双击 F2 直达文本工作区，敲下关键词筛出想要的那个文字块，按 Enter 内容直接贴回到光标位置。</p>
+<h3>总结</h3>
+<p>真正好用的工具，往往不是功能列表有多长，而是它悄悄把你每天重复的小动作从十几秒压到三秒。<strong>PopDrop</strong> 解决的就是这么一件小事：拿东西的时候，东西就出现在手边。</p>`
+  },
+  {
+    id: 8,
+    title: "Affinity 全平台免费！更好替代 PS / AI 的专业设计软件",
+    category: "设计美化",
+    date: "2025-11-16",
+    excerpt: "如果你要用到专业设计软件，那一定绕不开 Adobe 全家桶。然而正版订阅要 $779 美元/年……但最近设计圈爆出重磅消息！知名专业设计软件 Affinity 在被 Canva 收购后，直接宣布永久免费！",
+    image: "https://picsum.photos/seed/affinity/800/400",
+    content: `<p>如果你要用到专业设计软件，那一定绕不开 Adobe 全家桶如 <strong>PhotoShop</strong>、<strong>Illustrator</strong>、<strong>InDesign</strong> 等。然而正版订阅要 $779 美元/年，很多人被迫去找破解版，既麻烦又特别不安全。</p>
+<p>但最近设计圈爆出重磅消息！知名专业设计软件 <strong>Affinity</strong> 在被 Canva 收购后，直接宣布<strong>永久免费</strong>！全新的 Affinity 桌面版将原本收费的 Photo、Designer、Publisher 三款独立软件整合成一款应用，可完全替代 PS+AI+ID 全家桶，并且商用免费！</p>
+<h3>三合一模式</h3>
+<ul>
+<li><strong>Pixel (像素)</strong> - 对应原来的 Photo，平替 PS，用于图像处理、修图</li>
+<li><strong>Vector (矢量)</strong> - 对应原来的 Designer，平替 AI，用于矢量图形设计</li>
+<li><strong>Layout (排版)</strong> - 对应原来的 Publisher，平替 InDesign，用于排版/版面设计</li>
+</ul>
+<h3>有没有坑？</h3>
+<p>据网友实测，<strong>核心功能确实全免费</strong>！非破坏性编辑、RAW 格式处理、矢量路径调整、CMYK 色彩支持、千层图层流畅操作……这些专业功能一个没少。</p>
+<p>主要收费途径是\"高级 AI 功能\"的额外付费，包括生成式填充、智能移除背景、超分辨率放大、人像光线调整等。对于 AI 功能需求不高，主要是手工编辑的设计师来说，免费版已经绰绰有余了。</p>
+<h3>文件兼容</h3>
+<p>Affinity 兼容支持几乎所有主流格式：PSD、AI、IDML、PDF、SVG、TIFF、RAW 等。你可以直接打开 Adobe 软件创建的文件继续编辑，也可以把 Affinity 做好的作品导出成 Adobe 格式。</p>
+<h3>总结</h3>
+<p><strong>Affinity</strong> 现在等于是将 Photoshop + Illustrator + InDesign 装进一个 App，下载/安装/使用都更方便，完全就是 Adobe 全家桶的最佳平替之一。</p>`
+  },
+  {
+    id: 9,
+    title: "TinyPlay 秒变客厅电视盒子 (开源免费/投屏/手机当遥控器)",
+    category: "多媒体类",
+    date: "2026-10-06",
+    excerpt: "家里有台吃灰闲置的 Windows 笔记本、NUC、迷你主机或者 Mac mini 吗？放着也是浪费，不如通过 TinyPlay 让它们重新上岗，一秒变成一台客厅电视盒子用来看片或投屏吧……",
+    image: "https://picsum.photos/seed/tinyplay/800/400",
+    content: `<p>家里有台吃灰闲置的 Windows 笔记本、NUC、迷你主机或者 Mac mini 吗？放着也是浪费，不如通过 <strong>TinyPlay</strong> 让它们重新上岗，一秒变成一台<strong>客厅电视盒子</strong>用来看片或投屏吧。</p>
+<h3>TinyPlay 是什么？</h3>
+<p><strong>TinyPlay</strong> 是一款开源免费的影音播放工具，可以把闲置的 Windows 或 macOS 电脑变成一个操作方便的电视盒子，提供私人海报墙媒体库点播（支持本地播放 + SMB、WebDAV）、支持接受投屏等功能！并将你的手机变成电视遥控器。</p>
+<p>你只需在电脑装上 TinyPlay，用 HDMI 连上电视，手机扫个码，整台电脑就成了一个专门放电影、看直播、刷视频的客厅播放器。手机就变成遥控器，选片、拖进度、切字幕、调倍速。</p>
+<h3>核心功能</h3>
+<ul>
+<li><strong>影音库：</strong>支持连接 Emby、Jellyfin、Plex 媒体服务器，海报墙、选集、搜片、续播全都有</li>
+<li><strong>MPV 内核：</strong>支持 MKV、HDR、杜比视界、TrueHD 和 PGS 字幕等常见影音格式</li>
+<li><strong>看 IPTV 直播：</strong>导入 M3U/M3U8 直播源</li>
+<li><strong>接收手机投屏：</strong>自带 DLNA 投屏接收器</li>
+<li><strong>手机当遥控器：</strong>快进快退、拖动进度、切换音轨/字幕、调整倍速</li>
+</ul>
+<h3>和 Kodi 的区别</h3>
+<p><strong>Kodi</strong> 更像一个功能完整、但\"需要深度定制\"的家庭媒体中心，配置和学习成本更高。而 <strong>TinyPlay</strong> 更适合\"快速将电脑接入到电视、只想便捷看片\"的场景——轻量、开箱即用、用手机浏览器当遥控器。</p>
+<h3>总结</h3>
+<p><strong>TinyPlay</strong> 不会让一台老电脑性能变强，但能将吃灰闲置设备利用起来！它解决了\"电脑接电视、操作靠键鼠\"的别扭，影视点播体验做到更像电视盒子。</p>`
+  },
+  {
+    id: 10,
+    title: "OpenCut 开源版\"剪映\"替代品 - 免费无水印视频剪辑",
+    category: "多媒体类",
+    date: "2026-09-07",
+    excerpt: "视频剪辑本来应该是件挺有趣的事，结果这两年硬是被各种会员付费整出了火气……而开源版的 OpenCut 完全免费、无水印、不用登录，视频处理全在本地完成，甚至免安装只需浏览器就能剪视频！",
+    image: "https://picsum.photos/seed/opencut/800/400",
+    content: `<p>视频剪辑本来应该是件挺有趣的事，结果这两年硬是被各种会员付费整出了火气。下载了剪映、PR 之类的工具，想加个转场要会员；想导个高清要会员；连自动字幕都开始限次数。</p>
+<p>而开源版的 <strong>OpenCut</strong> 完全免费、无水印、不用登录，视频处理全在本地完成，甚至免安装只需浏览器就能剪视频。</p>
+<h3>OpenCut 是什么？</h3>
+<p>OpenCut 被誉为轻量级<strong>开源的\"剪映\"</strong>替代品。它是一款完全免费、跨平台的视频剪辑编辑器，个人用、商用、二次修改都免费无限制，没有会员、没有水印、没有广告，也不用注册登录。你可以<strong>直接在浏览器里打开就用，不用下载安装几 GB 的客户端</strong>。</p>
+<h3>核心功能</h3>
+<ul>
+<li><strong>多轨时间线：</strong>视频、音频、文字、贴纸分层摆放，支持拖动、缩放、批量选择</li>
+<li><strong>关键帧动画：</strong>位置、缩放、旋转、透明度都能打关键帧，带贝塞尔曲线编辑器</li>
+<li><strong>字幕与画布：</strong>能导入字幕文件生成字幕，画布尺寸随意设</li>
+<li><strong>实时预览加磁吸对齐</strong>，快捷键优先，针对竖屏 9:16 的布局预设</li>
+<li><strong>导出一键套用平台尺寸：</strong>YouTube 1080p/4K、TikTok 竖屏、Instagram 正方形</li>
+</ul>
+<h3>对比</h3>
+<table>
+<tr><th>特性</th><th>OpenCut</th><th>剪映</th><th>Premiere</th></tr>
+<tr><td>价格</td><td>免费 (MIT 开源)</td><td>部分功能收费</td><td>订阅制</td></tr>
+<tr><td>导出水印</td><td>无水印</td><td>免费版带水印</td><td>无水印</td></tr>
+<tr><td>素材存放</td><td>全部本地</td><td>依赖云端</td><td>本地</td></tr>
+<tr><td>是否开源</td><td>是</td><td>否</td><td>否</td></tr>
+<tr><td>上手门槛</td><td>低</td><td>低</td><td>高</td></tr>
+</table>
+<h3>总结</h3>
+<p><strong>OpenCut</strong> 最大的价值，不是说今天就能把剪映/PR 换掉，而是证明了基础剪辑工具完全可以更开放、更尊重用户。如果你今天就需要一个免费的剪映替代品，实现简单基础的剪辑功能，那么使用 OpenCut 就能体验！</p>`
+  }
+];
+*/
+
+// 渲染列表
+function renderList() {
+  const list = document.getElementById('articleList');
+  list.innerHTML = articles.map(a => `
+    <div class="article-card" onclick="openDetail(${a.id})">
+      <img src="${a.image}" alt="${a.title}">
+      <div class="article-card-body">
+        <span class="category">${a.category}</span>
+        <h2>${a.title}</h2>
+        <p class="excerpt">${a.excerpt}</p>
+        <div class="meta">${a.date}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// 打开详情
+function openDetail(id) {
+  const a = articles.find(x => x.id === id);
+  if (!a) return;
+  document.getElementById('detailHero').src = a.image;
+  document.getElementById('detailTitle').textContent = a.title;
+  document.getElementById('detailMeta').textContent = `${a.category} · ${a.date}`;
+  document.getElementById('detailBody').innerHTML = a.content;
+  document.getElementById('listPage').classList.add('hidden');
+  document.getElementById('detailPage').classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// 返回
+function goBack() {
+  document.getElementById('detailPage').classList.remove('active');
+  document.getElementById('listPage').classList.remove('hidden');
+  window.scrollTo(0, 0);
+}
+
+loadArticles();
+</script>
+</body>
+</html>
