@@ -25,8 +25,7 @@ jobs:
 
       - name: 安装依赖
         run: |
-          pip install requests beautifulsoup4 lxml playwright
-          playwright install chromium
+          pip install requests beautifulsoup4
 
       - name: 执行爬虫
         run: python crawl.py
