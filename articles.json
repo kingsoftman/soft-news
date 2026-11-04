@@ -77,7 +77,7 @@
       "title": "安卓调整原有分区大小之用parted的分区工具工具",
       "category": "文档办公",
       "date": "2026-11-04",
-      "excerpt": "",
+      "excerpt": "安卓调整原有分区大小怎么可以优雅的分区",
       "coverSeed": "default",
       "htmlContent": "1、安装parted分区工具。\n2、adb shell进入命令行，调整分区。\n3、查询逻辑卷\n命令1：\nls -l /dev/block/mapper\n命令2：\ndf -h\n\n4、调整要弄的分区\nparted /dev/block/sda\n\n输入P 打印当前分区信息。\n\n删除分区\nrm 34\n\n新建分区\nmkpart userdata ext4 3064MB 19GB\n\n5、重启进入fastboot 模式。\nfastboot erase userdata\n6、至此完成分区调整。\n7、输入新的镜像即可。\nfastboot flash userdata xxxx.img"
     }
