@@ -71,15 +71,6 @@
       "excerpt": "如果你要用到专业设计软件，那一定绕不开 Adobe 全家桶。然而正版订阅要 $779 美元/年。现在 Affinity 被 Canva 收购后，直接宣布永久免费！",
       "coverSeed": "affinity",
       "htmlContent": "<p>如果你要用到专业设计软件，那一定绕不开 Adobe 全家桶如 <strong>PhotoShop</strong>、<strong>Illustrator</strong>、<strong>InDesign</strong> 等。然而正版订阅要 $779 美元/年，很多人被迫去找破解版，既麻烦又特别不安全。</p><p>但最近设计圈爆出重磅消息！知名专业设计软件 <strong>Affinity</strong> 在被 Canva 收购后，直接宣布<strong>永久免费</strong>！全新的 Affinity 桌面版将原本收费的 Photo、Designer、Publisher 三款独立软件整合成一款应用，可完全替代 PS+AI+ID 全家桶，并且商用免费！</p><h3>三合一模式</h3><ul><li><strong>Pixel (像素)</strong> - 对应原来的 Photo，平替 PS，用于图像处理、修图</li><li><strong>Vector (矢量)</strong> - 对应原来的 Designer，平替 AI，用于矢量图形设计</li><li><strong>Layout (排版)</strong> - 对应原来的 Publisher，平替 InDesign，用于排版/版面设计</li></ul><h3>有没有坑？</h3><p>据网友实测，<strong>核心功能确实全免费</strong>！非破坏性编辑、RAW 格式处理、矢量路径调整、CMYK 色彩支持、千层图层流畅操作……这些专业功能一个没少。</p><p>主要收费途径是\"高级 AI 功能\"的额外付费，包括生成式填充、智能移除背景、超分辨率放大、人像光线调整等。对于 AI 功能需求不高，主要是手工编辑的设计师来说，免费版已经绰绰有余了。</p><h3>文件兼容</h3><p>Affinity 兼容支持几乎所有主流格式：PSD、AI、IDML、PDF、SVG、TIFF、RAW 等。你可以直接打开 Adobe 软件创建的文件继续编辑，也可以把 Affinity 做好的作品导出成 Adobe 格式。</p><h3>总结</h3><p><strong>Affinity</strong> 现在等于是将 Photoshop + Illustrator + InDesign 装进一个 App，下载/安装/使用都更方便，完全就是 Adobe 全家桶的最佳平替之一。</p>"
-    },
-    {
-      "id": 9,
-      "title": "TinyPlay 秒变客厅电视盒子 (开源免费/投屏/手机当遥控器)",
-      "category": "多媒体类",
-      "date": "2026-10-06",
-      "excerpt": "家里有台吃灰闲置的 Windows 笔记本、NUC、迷你主机或者 Mac mini 吗？放着也是浪费，不如通过 TinyPlay 让它们重新上岗，一秒变成一台客厅电视盒子！",
-      "coverSeed": "tinyplay",
-      "htmlContent": "<p>家里有台吃灰闲置的 Windows 笔记本、NUC、迷你主机或者 Mac mini 吗？放着也是浪费，不如通过 <strong>TinyPlay</strong> 让它们重新上岗，一秒变成一台<strong>客厅电视盒子</strong>用来看片或投屏吧。</p><h3>TinyPlay 是什么？</h3><p><strong>TinyPlay</strong> 是一款开源免费的影音播放工具，可以把闲置的 Windows 或 macOS 电脑变成一个操作方便的电视盒子，提供私人海报墙媒体库点播（支持本地播放 + SMB、WebDAV）、支持接受投屏等功能！并将你的手机变成电视遥控器。</p><p>你只需在电脑装上 TinyPlay，用 HDMI 连上电视，手机扫个码，整台电脑就成了一个专门放电影、看直播、刷视频的客厅播放器。手机就变成遥控器，选片、拖进度、切字幕、调倍速。</p><h3>核心功能</h3><ul><li><strong>影音库：</strong>支持连接 Emby、Jellyfin、Plex 媒体服务器，海报墙、选集、搜片、续播全都有</li><li><strong>MPV 内核：</strong>支持 MKV、HDR、杜比视界、TrueHD 和 PGS 字幕等常见影音格式</li><li><strong>看 IPTV 直播：</strong>导入 M3U/M3U8 直播源</li><li><strong>接收手机投屏：</strong>自带 DLNA 投屏接收器</li><li><strong>手机当遥控器：</strong>快进快退、拖动进度、切换音轨/字幕、调整倍速</li></ul><h3>和 Kodi 的区别</h3><p><strong>Kodi</strong> 更像一个功能完整、但\"需要深度定制\"的家庭媒体中心，配置和学习成本更高。而 <strong>TinyPlay</strong> 更适合\"快速将电脑接入到电视、只想便捷看片\"的场景——轻量、开箱即用、用手机浏览器当遥控器。</p><h3>总结</h3><p><strong>TinyPlay</strong> 不会让一台老电脑性能变强，但能将吃灰闲置设备利用起来！它解决了\"电脑接电视、操作靠键鼠\"的别扭，影视点播体验做到更像电视盒子。</p>"
     }
   ]
 }
