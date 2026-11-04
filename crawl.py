@@ -1,26 +1,19 @@
 import json
-import requests
-from bs4 import BeautifulSoup
+from scrapling import Fetcher
 
 OUTPUT = "articles.json"
+fetcher = Fetcher(auto_match=False)
 
 def main():
     items = []
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
-    }
     try:
         url = "https://androidcommunity.com/"
-        resp = requests.get(url, headers=headers, timeout=25)
-        resp.raise_for_status()
-        resp.encoding = "utf-8"
-        soup = BeautifulSoup(resp.text, "html.parser")
-        # 首页文章卡片
-        article_list = soup.select("article h2 a")
+        page = fetcher.get(url, stealthy=True)
+        article_list = page.css("article h2 a")
         print(f"✅ 抓到 {len(article_list)} 条资讯")
         for idx, a in enumerate(article_list[:15]):
             title = a.get_text(strip=True)
-            href = a.get("href")
+            href = a.attrib.get("href")
             items.append({
                 "id": idx,
                 "title": title,
