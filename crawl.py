@@ -15,12 +15,11 @@ def fetch_magisk():
         resp = requests.get(url, headers=HEADERS, timeout=20)
         resp.raise_for_status()
         data = resp.json()
-        for idx, release in enumerate(data[:4]):
+        for release in data:
             title = release["name"] or release["tag_name"]
             excerpt = release["body"][:120] + "..." if len(release["body"]) > 120 else release["body"]
             html = f"<p>{release['body']}</p><p>查看详情：<a href='{release['html_url']}'>{release['html_url']}</a></p>"
             items.append({
-                "id": idx + 1,
                 "title": f"Magisk - {title}",
                 "category": "刷机资讯",
                 "date": datetime.now().strftime("%Y-%m-%d"),
@@ -40,7 +39,7 @@ def fetch_lineageos():
         resp.raise_for_status()
         soup = BeautifulSoup(resp.text, "html.parser")
         blocks = soup.select("article")
-        for idx, block in enumerate(blocks[:4]):
+        for block in blocks:
             h2 = block.select_one("h2")
             if not h2:
                 continue
@@ -49,7 +48,6 @@ def fetch_lineageos():
             excerpt = p.get_text(strip=True) if p else ""
             html = str(block)
             items.append({
-                "id": 100 + idx + 1,
                 "title": f"LineageOS - {title}",
                 "category": "刷机资讯",
                 "date": datetime.now().strftime("%Y-%m-%d"),
@@ -61,44 +59,20 @@ def fetch_lineageos():
         print(f"LineageOS抓取失败: {e}")
     return items
 
-def fetch_xda():
-    items = []
-    try:
-        # XDA 首页最新帖子列表
-        url = "https://forum.xda-developers.com/latest/"
-        resp = requests.get(url, headers=HEADERS, timeout=20)
-        resp.raise_for_status()
-        soup = BeautifulSoup(resp.text, "html.parser")
-        threads = soup.select(".structItem-title a")
-        for idx, a in enumerate(threads[:4]):
-            title = a.get_text(strip=True)
-            link = a.get("href", "")
-            if link.startswith("/"):
-                link = "https://forum.xda-developers.com" + link
-            excerpt = "XDA社区最新刷机讨论帖"
-            html = f"<p>帖子标题：{title}</p><p>访问原帖：<a href='{link}'>{link}</a></p>"
-            items.append({
-                "id": 200 + idx + 1,
-                "title": f"XDA - {title}",
-                "category": "刷机资讯",
-                "date": datetime.now().strftime("%Y-%m-%d"),
-                "excerpt": excerpt,
-                "coverSeed": "default",
-                "htmlContent": html
-            })
-    except Exception as e:
-        print(f"XDA抓取失败: {e}")
-    return items
-
 def main():
     list1 = fetch_magisk()
     list2 = fetch_lineageos()
-    list3 = fetch_xda()
-    all_articles = list1 + list2 + list3
+    all_articles = list1 + list2
+    # 只保留前10条
+    all_articles = all_articles[:10]
+    # 手动分配id
+    for idx, item in enumerate(all_articles):
+        item["id"] = idx + 1
+
     out = {"articles": all_articles}
     with open(OUTPUT, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, indent=2)
-    print(f"✅ 抓取完成，一共 {len(all_articles)} 条")
+    print(f"✅ 抓取完成，最终输出 {len(all_articles)} 条")
 
 if __name__ == "__main__":
     main()
