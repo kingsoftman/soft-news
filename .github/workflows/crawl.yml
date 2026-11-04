@@ -25,7 +25,7 @@ jobs:
 
       - name: 安装依赖
         run: |
-          pip install requests beautifulsoup4
+          pip install newspaper3k
 
       - name: 执行爬虫
         run: python crawl.py
