@@ -14,37 +14,31 @@ async def main():
         )
         page = await context.new_page()
         try:
-            # 北京教育考试院自考栏目
-            await page.goto("https://www.bjeea.cn/html/selfstudy/", timeout=35000, wait_until="networkidle")
-            # 列表选择器：页面里的新闻列表li>a
-            links = await page.locator(".list01 li a").all()
-            print(f"✅ 抓到链接数量：{len(links)}")
-            for idx, link_el in enumerate(links[:15]):
-                title = await link_el.inner_text()
-                href = await link_el.get_attribute("href")
-                if href and not href.startswith("http"):
-                    href = "https://www.bjeea.cn" + href
-                items.append({
-                    "id": idx,
-                    "title": title.strip(),
-                    "category": "自考通知",
-                    "excerpt": "",
-                    "coverSeed": "default",
-                    "htmlContent": f"<p>原文地址：{href}</p>"
-                })
+            await page.goto("https://httpbin.org/html", timeout=30000, wait_until="domcontentloaded")
+            # 这个页面只有 h1 标题，拿来测试连通性
+            title = await page.locator("h1").inner_text()
+            items.append({
+                "id": 1,
+                "title": title.strip(),
+                "category": "测试",
+                "excerpt": "测试数据",
+                "coverSeed": "default",
+                "htmlContent": "<p>测试抓取成功</p>"
+            })
+            print("✅ 页面访问成功，拿到标题")
         except TimeoutError:
-            print("⚠️ 页面加载超时，本次不更新文件，保留旧数据")
+            print("⚠️ 超时，本次不更新json")
         except Exception as e:
-            print(f"⚠️ 抓取异常：{str(e)}")
+            print(f"⚠️ 异常：{str(e)}")
         finally:
             await browser.close()
 
     if len(items) > 0:
         with open(OUTPUT, "w", encoding="utf-8") as f:
             json.dump(items, f, ensure_ascii=False, indent=2)
-        print(f"✅ 写入 {len(items)} 条通知")
+        print(f"✅ 写入测试数据")
     else:
-        print("ℹ️ 没有抓到数据，不修改json")
+        print("ℹ️ 无数据，不修改文件")
 
 if __name__ == "__main__":
     asyncio.run(main())
