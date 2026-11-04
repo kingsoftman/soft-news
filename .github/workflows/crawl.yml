@@ -14,8 +14,6 @@ jobs:
     steps:
       - name: 拉取仓库代码
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: 设置Python
         uses: actions/setup-python@v5
@@ -33,16 +31,8 @@ jobs:
       - name: 执行爬虫脚本
         run: python crawl.py
 
-      - name: 判断并提交更新
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          # 先判断文件是否发生变化
-          if git diff --quiet articles.json; then
-            echo "✅ articles.json 无变化，直接退出，不提交"
-            exit 0
-          fi
-          git add articles.json
-          git pull --rebase origin main
-          git commit -m "自动更新资讯"
-          git push origin main
+      - name: 自动提交
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "自动更新资讯"
+          file_pattern: articles.json
