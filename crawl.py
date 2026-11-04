@@ -1,36 +1,37 @@
-import requests
-from bs4 import BeautifulSoup
 import json
-import os
 import time
+from playwright.sync_api import sync_playwright
 
-URL = "https://www.iplaysoft.com/"
 OUTPUT = "articles.json"
 
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-    "Accept-Language": "zh-CN,zh;q=0.9",
-    "Referer": "https://www.iplaysoft.com/"
-}
-
 def main():
-    try:
-        resp = requests.get(URL, headers=HEADERS, timeout=15)
-        resp.raise_for_status()
-        soup = BeautifulSoup(resp.text, "html.parser")
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        context = browser.new_context(
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            locale="zh-CN"
+        )
+        page = context.new_page()
+        page.goto("https://www.iplaysoft.com/", timeout=30000)
+        page.wait_for_selector(".post-item", timeout=20000)
+
         items = []
-        article_list = soup.select(".post-item")
-        print(f"本次抓到 {len(article_list)} 篇文章")
-        for idx, article in enumerate(article_list[:15]):
-            title_tag = article.select_one("h2 a")
-            if not title_tag:
-                continue
-            title = title_tag.get_text(strip=True)
-            link = title_tag["href"]
-            excerpt_tag = article.select_one(".excerpt")
-            excerpt = excerpt_tag.get_text(strip=True) if excerpt_tag else ""
-            date_tag = article.select_one(".date")
-            date = date_tag.get_text(strip=True) if date_tag else time.strftime("%Y-%m-%d")
+        article_list = page.locator(".post-item").all()[:15]
+        print(f"抓到 {len(article_list)} 篇")
+
+        for idx, art in enumerate(article_list):
+            title_tag = art.locator("h2 a")
+            title = title_tag.inner_text().strip()
+            link = title_tag.get_attribute("href")
+            try:
+                excerpt = art.locator(".excerpt").inner_text().strip()
+            except:
+                excerpt = ""
+            try:
+                date = art.locator(".date").inner_text().strip()
+            except:
+                date = time.strftime("%Y-%m-%d")
+
             items.append({
                 "id": idx,
                 "title": title,
@@ -38,14 +39,13 @@ def main():
                 "date": date,
                 "excerpt": excerpt,
                 "coverSeed": "default",
-                "htmlContent": f"<p>{excerpt}</p><p>原文地址：{link}</p>"
+                "htmlContent": f"<p>{excerpt}</p><p>原文：{link}</p>"
             })
-        # 写入文件
-        with open(OUTPUT, "w", encoding="utf-8") as f:
-            json.dump(items, f, ensure_ascii=False, indent=2)
-        print("写入 articles.json 成功")
-    except Exception as e:
-        print(f"抓取异常：{e}")
+        browser.close()
+
+    with open(OUTPUT, "w", encoding="utf-8") as f:
+        json.dump(items, f, ensure_ascii=False, indent=2)
+    print("写入成功")
 
 if __name__ == "__main__":
     main()
