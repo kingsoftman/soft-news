@@ -1,50 +1,46 @@
-name: 自动抓取资讯
+name: 定时爬取iplaysoft
 on:
-  workflow_dispatch:
+  push:
+    branches: [ main ]
   schedule:
-    - cron: '0 8 * * *'
+    - cron: '0 0,6,12 * * *'
+  workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  crawl_job:
+  crawl:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
     steps:
-      - name: 拉取仓库代码
+      - name: 拉取代码
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: 设置Python
+      - name: 安装Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
       - name: 安装依赖
         run: |
-          pip install playwright
-
-      - name: 安装Chromium
-        run: |
+          pip install requests beautifulsoup4 lxml playwright
           playwright install chromium
 
-      - name: 执行爬虫脚本
+      - name: 执行爬虫
         run: python crawl.py
 
       - name: 提交更新
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout main
-          # 先判断文件有没有改动
-          CHANGED=$(git diff --quiet articles.json; echo $?)
-          if [ $CHANGED -eq 0 ]; then
-            echo "✅ 无更新，直接退出"
-            exit 0
-          fi
           git pull origin main
           git add articles.json
-          git commit -m "🤖 自动更新 articles.json"
+          # 判断是否有改动，无改动直接退出，不push
+          if git diff --quiet --cached articles.json; then
+            echo "✅ 没有新内容，跳过提交"
+            exit 0
+          fi
+          git commit -m "auto update articles"
           git push origin main
