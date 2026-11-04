@@ -10,22 +10,21 @@ def main():
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
     }
     try:
-        url = "https://www.chinanews.com.cn/gn/news_list.shtml"
+        url = "https://androidcommunity.com/"
         resp = requests.get(url, headers=headers, timeout=25)
         resp.raise_for_status()
         resp.encoding = "utf-8"
         soup = BeautifulSoup(resp.text, "html.parser")
-        links = soup.select(".dd_lm li a")
-        print(f"✅ 抓到 {len(links)} 条新闻")
-        for idx, a in enumerate(links[:15]):
+        # 首页文章卡片
+        article_list = soup.select("article h2 a")
+        print(f"✅ 抓到 {len(article_list)} 条资讯")
+        for idx, a in enumerate(article_list[:15]):
             title = a.get_text(strip=True)
             href = a.get("href")
-            if href and not href.startswith("http"):
-                href = "https://www.chinanews.com.cn" + href
             items.append({
                 "id": idx,
                 "title": title,
-                "category": "国内新闻",
+                "category": "安卓资讯",
                 "excerpt": "",
                 "coverSeed": "default",
                 "htmlContent": f"<p>原文地址：{href}</p>"
