@@ -4,6 +4,9 @@ on:
   schedule:
     - cron: '0 8 * * *'
 
+permissions:
+  contents: write
+
 jobs:
   crawl_job:
     runs-on: ubuntu-latest
@@ -30,8 +33,17 @@ jobs:
       - name: 执行爬虫脚本
         run: python crawl.py
 
-      - name: 自动提交
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "自动更新资讯"
-          branch: main
+      - name: 提交更新
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add articles.json
+          # 判断是否有修改，没有修改直接退出
+          if git diff --quiet --cached; then
+            echo "✅ 无新内容，跳过提交"
+            exit 0
+          fi
+          # 先拉取远端最新，避免冲突
+          git pull --rebase origin main
+          git commit -m "自动更新资讯"
+          git push origin main
