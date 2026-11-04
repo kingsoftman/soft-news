@@ -1,37 +1,40 @@
-name: 定时爬取iplaysoft
+name: 自动抓取资讯
 on:
-  push:
-    branches: [ main ]
-  schedule:
-    - cron: '0 0,6,12 * * *'
   workflow_dispatch:
-
-permissions:
-  contents: write
+  schedule:
+    - cron: '0 8 * * *'
 
 jobs:
-  crawl:
+  crawl_job:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
-      - name: 拉取代码
+      - name: 拉取仓库代码
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: 安装Python
+      - name: 设置Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
       - name: 安装依赖
         run: |
-          pip install requests beautifulsoup4 lxml
+          pip install playwright
 
-      - name: 执行爬虫
+      - name: 安装Chromium
+        run: |
+          playwright install chromium
+
+      - name: 执行爬虫脚本
         run: python crawl.py
 
       - name: 提交更新
         run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "actions@github.com"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add articles.json
-          git commit -m "auto update articles" || echo "No new content, skip commit"
+          # 只有文件变化才提交
+          git diff --quiet && git diff --staged --quiet || git commit -m "自动更新资讯"
           git push
