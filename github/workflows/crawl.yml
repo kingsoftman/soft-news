@@ -1,0 +1,23 @@
+name: 定时爬取iplaysoft
+on:
+  schedule:
+    - cron: '0 0,6,12 * * *'
+  workflow_dispatch:
+
+jobs:
+  crawl_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出仓库代码
+        uses: actions/checkout@v4
+      - name: 安装python依赖
+        run: |
+          pip install requests beautifulsoup4 lxml
+      - name: 执行爬虫脚本
+        run: python3 crawl.py
+      - name: 提交更新articles.json
+        run: |
+          git config --global user.name "github‑actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add articles.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "🤖 自动更新爬虫文章" && git push)
