@@ -1,0 +1,16 @@
+name: 定时唤醒仓库
+on:
+  schedule:
+    - cron: '0 1 1 * *' # UTC每月1号1点，北京时间9点，每月一次推送空提交
+  workflow_dispatch:
+jobs:
+  wake:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 空提交唤醒
+        run: |
+          git config --global user.name "kingsoftman"
+          git config --global user.email "kingsoftman@users.noreply.github.com"
+          git commit --allow-empty -m "auto wake repo"
+          git push
