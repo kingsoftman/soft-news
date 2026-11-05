@@ -2,6 +2,7 @@ import requests
 import time
 import json
 from bs4 import BeautifulSoup
+from urllib.parse import urljoin
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
@@ -9,7 +10,7 @@ HEADERS = {
 }
 
 result_list = []
-MAX_DEPTH = 2
+MAX_DEPTH = 3
 
 def scan(url: str, depth: int = 0):
     if depth > MAX_DEPTH:
@@ -24,33 +25,22 @@ def scan(url: str, depth: int = 0):
         return
 
     soup = BeautifulSoup(resp.text, "html.parser")
-    # 直接拿页面全部a标签，不再限定tbody tr
-    all_a = soup.find_all("a")
-    for a_tag in all_a:
-        href = a_tag.get("href")
-        if not href:
+    rows = soup.select("tr.entry")
+    for tr in rows:
+        a_tag = tr.select_one("td.name a")
+        if not a_tag:
             continue
-        # 跳过上级、父目录
+        href = a_tag.get("href")
         if href in ("../", "./", "_h5ai/"):
             continue
-        # 过滤掉锚点、外部链接
-        if href.startswith("http"):
-            continue
 
-        full_url = url + href
+        full_url = urljoin(url, href)
         name = a_tag.get_text(strip=True)
-        if not name:
-            continue
+        mtime_el = tr.select_one("td.modified")
+        size_el = tr.select_one("td.size")
+        mtime = mtime_el.get_text(strip=True) if mtime_el else ""
+        size_str = size_el.get_text(strip=True) if size_el else ""
         is_dir = href.endswith("/")
-
-        # 取这个a的同行后面的时间、大小（h5ai布局：a后面跟着两个span）
-        parent = a_tag.parent
-        mtime = ""
-        size_str = ""
-        spans = parent.find_all("span")
-        if len(spans)>=2:
-            mtime = spans[0].get_text(strip=True)
-            size_str = spans[1].get_text(strip=True)
 
         item = {
             "name": name,
