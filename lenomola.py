@@ -10,9 +10,15 @@ def scan(page, url: str, depth: int = 0):
     if depth > MAX_DEPTH:
         return
     print(f"打开页面: {url}")
-    page.goto(url, timeout=30000)
-    page.wait_for_selector("table", timeout=15000)
-    time.sleep(1.5)
+    try:
+        page.goto(url, timeout=40000)
+        # 等待页面网络空闲，h5ai加载数据
+        page.wait_for_load_state("networkidle", timeout=30000)
+        # 等待可见的 .entry 行，而不是等table
+        page.wait_for_selector("tr.entry", timeout=25000, state="visible")
+    except Exception as e:
+        print(f"页面加载异常 {url} -> {e}")
+        return
 
     rows = page.locator("tr.entry").all()
     for row in rows:
@@ -43,8 +49,11 @@ def scan(page, url: str, depth: int = 0):
 
 if __name__ == "__main__":
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        context = browser.new_context(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
+        browser = p.chromium.launch(headless=True, args=["--no-sandbox"])
+        context = browser.new_context(
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+            viewport={"width":1280,"height":720}
+        )
         page = context.new_page()
         base_url = "https://mirrors.lolinet.com/firmware/lenomola/"
         scan(page, base_url, depth=0)
