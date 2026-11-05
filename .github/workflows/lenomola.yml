@@ -11,23 +11,25 @@ on:
 jobs:
   crawl:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
         with:
           persist-credentials: true
 
-      - name: 安装依赖
-        run: pip install requests beautifulsoup4 lxml
+      - name: 安装python依赖
+        run: pip install playwright
+
+      - name: 安装chromium浏览器
+        run: playwright install chromium
 
       - name: 执行爬虫脚本
-        run: python lenomola.py
+        run: python crawl_lenomola.py
 
       - name: 提交更新文件
         run: |
           git config --global user.name "kingsoftman"
           git config --global user.email "kingsoftman@users.noreply.github.com"
           git add lenomola_meta.json
-          # 无变更就跳过commit
           git diff --quiet && git diff --staged --quiet || (git commit -m "自动更新 lenomola 固件目录元数据" && git push)
