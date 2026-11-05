@@ -1,1 +1,65 @@
-[]
+[
+  {
+    "name": "Parent Directory",
+    "url": "https://mirrors.lolinet.com/firmware/lenomola/..",
+    "mtime": "",
+    "size": "",
+    "is_dir": false
+  },
+  {
+    "name": "2020",
+    "url": "https://mirrors.lolinet.com/firmware/lenomola//firmware/lenomola/2020/",
+    "mtime": "",
+    "size": "",
+    "is_dir": true
+  },
+  {
+    "name": "2021",
+    "url": "https://mirrors.lolinet.com/firmware/lenomola//firmware/lenomola/2021/",
+    "mtime": "",
+    "size": "",
+    "is_dir": true
+  },
+  {
+    "name": "2022",
+    "url": "https://mirrors.lolinet.com/firmware/lenomola//firmware/lenomola/2022/",
+    "mtime": "",
+    "size": "",
+    "is_dir": true
+  },
+  {
+    "name": "2023",
+    "url": "https://mirrors.lolinet.com/firmware/lenomola//firmware/lenomola/2023/",
+    "mtime": "",
+    "size": "",
+    "is_dir": true
+  },
+  {
+    "name": "2024",
+    "url": "https://mirrors.lolinet.com/firmware/lenomola//firmware/lenomola/2024/",
+    "mtime": "",
+    "size": "",
+    "is_dir": true
+  },
+  {
+    "name": "2025",
+    "url": "https://mirrors.lolinet.com/firmware/lenomola//firmware/lenomola/2025/",
+    "mtime": "",
+    "size": "",
+    "is_dir": true
+  },
+  {
+    "name": "2026",
+    "url": "https://mirrors.lolinet.com/firmware/lenomola//firmware/lenomola/2026/",
+    "mtime": "",
+    "size": "",
+    "is_dir": true
+  },
+  {
+    "name": "_obsoleted_",
+    "url": "https://mirrors.lolinet.com/firmware/lenomola//firmware/lenomola/_obsoleted_/",
+    "mtime": "",
+    "size": "",
+    "is_dir": true
+  }
+]
