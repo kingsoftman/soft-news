@@ -3,7 +3,7 @@
     {
       "title": "Magisk - Magisk v31.1",
       "category": "刷机资讯",
-      "date": "2026-11-10",
+      "date": "2026-11-11",
       "excerpt": "This release brings official support for Googlebooks (Aluminium OS), including automatic firmware download suggestions a...",
       "coverSeed": "default",
       "htmlContent": "<p>This release brings official support for Googlebooks (Aluminium OS), including automatic firmware download suggestions and the ability to patch recovery GPT images directly onto a connected USB drive. Bringing Magisk to Googlebooks also meant supporting Android's Headless System User Mode (HSUM), where user `0` operates strictly as a non-interactive background system user while human users run in secondary user profiles. Adapting Magisk to HSUM created several architectural challenges, as many longstanding features and internal mechanisms were built around the assumption that user `0` is always the primary interactive user.\r\n\r\nTo address this, the way superuser access is granted to apps has been redesigned, and the traditional interactive root request prompt has been removed. The existing reactive `su` request flow, which relies on intercepting a root call in the background daemon and launching a blocking UI prompt in the right user session, is fundamentally incompatible with HSUM, especially when handling non-app UIDs like `adb shell` that are not tied to a foreground user. Instead, superuser access is now explicitly granted to applications ahead of time directly from the Superuser tab in the Magisk app.\r\n\r\nFinally, the app hiding (package repackaging) feature has also been removed. Like interactive `su` prompts, the repackaging and stub management mechanisms are fundamentally incompatible with HSUM. More importantly, truly hiding an installed package from detection is nearly technically impossible on Android. Since interactive root prompts no longer require the Magisk app to remain installed at runtime and Magisk no longer automatically reinstalls the app if it is missing, the most effective way to hide the Magisk app is to simply uninstall it after configuring your superuser policies and modules.\r\n\r\n## Changelog\r\n\r\n- [General] Support Headless System User Mode (HSUM) devices\r\n- [General] Drop support for Android 6.0; Android 7.0 is now the minimum supported version\r\n- [General] Remove the app hiding (repackaging) feature and the stub app; Magisk no longer reinstalls the app automatically if it is missing\r\n- [App] Remove reactive superuser request prompts; superuser access is now explicitly granted ahead of time in the Superuser tab\r\n- [App] Unify the image patching pipeline across local files and remote URLs for raw images, OTA zips, factory image zips, Samsung Odin tars, and Aluminium OS recovery GPT images\r\n- [App] Automatically suggest official firmware downloads for Google Pixel and Googlebook (Aluminium OS) devices\r\n- [App] Support patching Aluminium OS recovery images and writing directly to a connected USB drive on Googlebooks\r\n- [App] Display real-time in-place read/write progress and transfer speeds when downloading and patching images\r\n- [MagiskSU] Remove obsolete superuser access mode and reauthentication settings\r\n- [MagiskSU] Fix `-g`/`-G` argument handling, forward unknown options to the shell, and fix daemon exec signal handling\r\n- [MagiskBoot] Support signing ChromeOS boot images natively and automatically re-sign on repack, removing the external `futility` binary\r\n- [MagiskBoot] Fix AVB 1.0 ECDSA signature verification and signing by using ASN.1 DER encoding\r\n- [MagiskBoot] Preserve Samsung `SignerVer02` signatures during boot image repack\r\n- [MagiskBoot] Revert updating AVB hash descriptor image size on repack\r\n- [MagiskBoot] Enable architecture-specific BCJ filters for XZ compression and improve `zImage` compressed payload detection\r\n- [MagiskBoot] Support building `magiskboot` natively on Linux and macOS hosts\r\n- [Core] Fix potential crashes when handling `NULL` database strings or failed daemon connections\r\n\r\n### Full Changelog: [here](https://topjohnwu.github.io/Magisk/changes.html)\r\n</p><p>查看详情：<a href='https://github.com/topjohnwu/Magisk/releases/tag/v31.1'>https://github.com/topjohnwu/Magisk/releases/tag/v31.1</a></p>",
@@ -12,7 +12,7 @@
     {
       "title": "Magisk - Magisk v31.0",
       "category": "刷机资讯",
-      "date": "2026-11-10",
+      "date": "2026-11-11",
       "excerpt": "The highlight of this release is a complete, ground-up rewrite of the **Magisk app UI**.\r\n\r\nOver the years, the Android ...",
       "coverSeed": "default",
       "htmlContent": "<p>The highlight of this release is a complete, ground-up rewrite of the **Magisk app UI**.\r\n\r\nOver the years, the Android application codebase had accumulated significant technical debt—spanning legacy XML layouts, Databinding, and KAPT. In this release, the entire UI layer has been rebuilt from scratch with modern **Jetpack Compose** and **Material 3**.\r\n\r\nThis rewrite allowed us to modernize the architecture and introduce substantial UI/UX improvements, with additional new features:\r\n\r\n- A new **built-in terminal emulator** with full TTY and ANSI support for module flashing and action scripts.\r\n- Direct support for **streaming and extracting boot images from remote OTA URLs** on-the-fly.\r\n\r\n### Legacy App Still Available\r\n\r\nThis kind of full rewrite can sometimes introduce unexpected edge cases or bugs. If you encounter issues with the new app, the legacy View-based version will still be built and uploaded for a couple of releases, available for download [here](https://github.com/topjohnwu/magisk-files/releases/download/files/Magisk-v31.0-legacy.apk).\r\n\r\n## Changelog\r\n\r\n- [App] Complete UI overhaul with Jetpack Compose and Material 3, completely removing the legacy View and Fragment architecture\r\n- [App] Add new built-in terminal emulator with full TTY and ANSI support for module flashing and action scripts\r\n- [App] Support downloading and streaming boot image extraction directly from remote OTA URLs\r\n- [MagiskBoot] Support dynamic zImage payload sizes without requiring exact size padding during repack\r\n- [MagiskBoot] Update AVB hash descriptor image size to match unpacked image size\r\n- [MagiskBoot] Lower default compression preset for XZ and LZMA to reduce memory usage during repacking\r\n- [Zygisk] Support Android 17 (API 37)\r\n- [Zygisk] Support Meta Quest (Horizon OS) lazy partition zygotes\r\n- [MagiskPolicy] Fix identifier parsing for names containing hyphens\r\n- [resetprop] Add `--compact` (`-c`) flag to compact property storage areas\r\n- [MagiskInit] Properly prioritize charger mode detection before `force_normal_boot`\r\n- [DenyList] Add `webview_zygote` as an unmount target\r\n\r\n### Full Changelog: [here](https://topjohnwu.github.io/Magisk/changes.html)\r\n</p><p>查看详情：<a href='https://github.com/topjohnwu/Magisk/releases/tag/v31.0'>https://github.com/topjohnwu/Magisk/releases/tag/v31.0</a></p>",
@@ -21,7 +21,7 @@
     {
       "title": "Magisk - Magisk v30.7",
       "category": "刷机资讯",
-      "date": "2026-11-10",
+      "date": "2026-11-11",
       "excerpt": "- [MagiskInit] Support Android 16 QPR2 sepolicy format\r\n- [MagiskInit] Support using klogdump partition as pre-init stor...",
       "coverSeed": "default",
       "htmlContent": "<p>- [MagiskInit] Support Android 16 QPR2 sepolicy format\r\n- [MagiskInit] Support using klogdump partition as pre-init storage\r\n- [Zygisk] Support Android 16 QPR2 and higher\r\n- [Zygisk] Support Android XR and some Nubia devices\r\n- [MagiskSU] Do not drop capabilities by default, even when switching to non-root UIDs. Explicitly use the `--drop-cap` argument to drop capabilities.\r\n- [MagiskBoot] Better lzma format detection\r\n- [MagiskBoot] Fix various commandline argument parsing bugs\r\n\r\n### Full Changelog: [here](https://topjohnwu.github.io/Magisk/changes.html)\r\n</p><p>查看详情：<a href='https://github.com/topjohnwu/Magisk/releases/tag/v30.7'>https://github.com/topjohnwu/Magisk/releases/tag/v30.7</a></p>",
@@ -30,7 +30,7 @@
     {
       "title": "Magisk - Magisk v30.6",
       "category": "刷机资讯",
-      "date": "2026-11-10",
+      "date": "2026-11-11",
       "excerpt": "### Hotfix\r\n\r\n- [MagiskInit] Revert a change that could result in bootloops\r\n\r\n### v30.5 Changelog\r\n\r\n- [General] Migrat...",
       "coverSeed": "default",
       "htmlContent": "<p>### Hotfix\r\n\r\n- [MagiskInit] Revert a change that could result in bootloops\r\n\r\n### v30.5 Changelog\r\n\r\n- [General] Migrate a significant portion of the codebase to Rust\r\n- [General] Various minor bug fixes\r\n- [General] Support installing Magisk into vendor_boot partition\r\n- [Core] Improve Magisk specific files injection logic\r\n- [MagiskSU] Add ability to restrict Linux capabilities even if running as root (uid=0)\r\n- [MagiskSU] Fallback to older implementation when the kernel doesn't support zero userspace copy APIs\r\n- [MagiskPolicy] Support new sepolicy binary format introduced in Android 16 QPR2\r\n- [resetprop] Reduce property modification traces\r\n- [resetprop] Properly support Android versions with property overrides\r\n\r\n### Full Changelog: [here](https://topjohnwu.github.io/Magisk/changes.html)\r\n</p><p>查看详情：<a href='https://github.com/topjohnwu/Magisk/releases/tag/v30.6'>https://github.com/topjohnwu/Magisk/releases/tag/v30.6</a></p>",
@@ -39,7 +39,7 @@
     {
       "title": "Magisk - Magisk v30.5",
       "category": "刷机资讯",
-      "date": "2026-11-10",
+      "date": "2026-11-11",
       "excerpt": "- [General] Migrate a significant portion of the codebase to Rust\r\n- [General] Various minor bug fixes\r\n- [General] Supp...",
       "coverSeed": "default",
       "htmlContent": "<p>- [General] Migrate a significant portion of the codebase to Rust\r\n- [General] Various minor bug fixes\r\n- [General] Support installing Magisk into vendor_boot partition\r\n- [Core] Improve Magisk specific files injection logic\r\n- [MagiskSU] Add ability to restrict Linux capabilities even if running as root (uid=0)\r\n- [MagiskSU] Fallback to older implementation when the kernel doesn't support zero userspace copy APIs\r\n- [MagiskPolicy] Support new sepolicy binary format introduced in Android 16 QPR2\r\n- [resetprop] Reduce property modification traces\r\n- [resetprop] Properly support Android versions with property overrides\r\n\r\n### Full Changelog: [here](https://topjohnwu.github.io/Magisk/changes.html)\r\n</p><p>查看详情：<a href='https://github.com/topjohnwu/Magisk/releases/tag/v30.5'>https://github.com/topjohnwu/Magisk/releases/tag/v30.5</a></p>",
@@ -48,7 +48,7 @@
     {
       "title": "Magisk - Magisk v30.4",
       "category": "刷机资讯",
-      "date": "2026-11-10",
+      "date": "2026-11-11",
       "excerpt": "- [MagiskSU] Fix several implementation bugs\n\n## Diffs to v29.0\n\n- [General] Various minor bug fixes\n- [General] Support...",
       "coverSeed": "default",
       "htmlContent": "<p>- [MagiskSU] Fix several implementation bugs\n\n## Diffs to v29.0\n\n- [General] Various minor bug fixes\n- [General] Support installing Magisk into vendor_boot partition\n- [General] Migrate a significant portion of the codebase to Rust\n- [Core] Improve Magisk specific files injection logic\n- [MagiskSU] Add ability to restrict Linux capabilities even if running as root (uid=0)\n- [MagiskSU] Fallback to older implementation when the kernel doesn't support zero userspace copy APIs\n- [MagiskPolicy] Support new sepolicy binary format introduced in Android 16 QPR2\n- [resetprop] Reduce property modification traces\n\n### Full Changelog: [here](https://topjohnwu.github.io/Magisk/changes.html)\n</p><p>查看详情：<a href='https://github.com/topjohnwu/Magisk/releases/tag/v30.4'>https://github.com/topjohnwu/Magisk/releases/tag/v30.4</a></p>",
@@ -57,7 +57,7 @@
     {
       "title": "Magisk - Magisk v30.3",
       "category": "刷机资讯",
-      "date": "2026-11-10",
+      "date": "2026-11-11",
       "excerpt": "- [General] Support installing Magisk into vendor_boot partition\n- [MagiskPolicy] Support new sepolicy binary format int...",
       "coverSeed": "default",
       "htmlContent": "<p>- [General] Support installing Magisk into vendor_boot partition\n- [MagiskPolicy] Support new sepolicy binary format introduced in Android 16 QPR2\n- [Core] Migrate much more code into Rust\n- [MagiskSU] Fallback to older implementation when the kernel doesn't support zero userspace copy APIs\n\n## Diffs to v29.0\n\n- [General] Various minor bug fixes\n- [General] Support installing Magisk into vendor_boot partition\n- [General] Migrate a significant portion of the codebase to Rust\n- [Core] Improve Magisk specific files injection logic\n- [MagiskSU] Add ability to restrict Linux capabilities even if running as root (uid=0)\n- [MagiskSU] Fallback to older implementation when the kernel doesn't support zero userspace copy APIs\n- [MagiskPolicy] Support new sepolicy binary format introduced in Android 16 QPR2\n- [resetprop] Reduce property modification traces\n\n### Full Changelog: [here](https://topjohnwu.github.io/Magisk/changes.html)\n</p><p>查看详情：<a href='https://github.com/topjohnwu/Magisk/releases/tag/v30.3'>https://github.com/topjohnwu/Magisk/releases/tag/v30.3</a></p>",
@@ -66,7 +66,7 @@
     {
       "title": "Magisk - Magisk v30.2",
       "category": "刷机资讯",
-      "date": "2026-11-10",
+      "date": "2026-11-11",
       "excerpt": "- [Core] Fix an edge case breaking modules when overlayfs is involved\n- [Core] Fix module `.replace` functionality in ce...",
       "coverSeed": "default",
       "htmlContent": "<p>- [Core] Fix an edge case breaking modules when overlayfs is involved\n- [Core] Fix module `.replace` functionality in certain situations\n- [resetprop] Reduce property modification traces\n\n## Diffs to v29.0\n\n- [General] Various minor bug fixes\n- [Core] Migrate module implementation to Rust\n- [Core] Improve Magisk specific files injection logic\n- [MagiskBoot] Migrate compression code to Rust\n- [MagiskSU] Add ability to restrict Linux capabilities even if running as root (uid=0)\n- [resetprop] Reduce property modification traces\n\n### Full Changelog: [here](https://topjohnwu.github.io/Magisk/changes.html)\n</p><p>查看详情：<a href='https://github.com/topjohnwu/Magisk/releases/tag/v30.2'>https://github.com/topjohnwu/Magisk/releases/tag/v30.2</a></p>",
@@ -75,7 +75,7 @@
     {
       "title": "Magisk - Magisk v30.1",
       "category": "刷机资讯",
-      "date": "2026-11-10",
+      "date": "2026-11-11",
       "excerpt": "- [Core] Fix bug in module mounting implementation\n- [MagiskSU] Add ability to restrict Linux capabilities even if runni...",
       "coverSeed": "default",
       "htmlContent": "<p>- [Core] Fix bug in module mounting implementation\n- [MagiskSU] Add ability to restrict Linux capabilities even if running as root (uid=0)\n\n## Diffs to v29.0\n\n- [General] Various minor bug fixes\n- [Core] Migrate module implementation to Rust\n- [Core] Improve Magisk specific files injection logic\n- [MagiskBoot] Migrate compression code to Rust\n- [MagiskSU] Add ability to restrict Linux capabilities even if running as root (uid=0)\n\n### Full Changelog: [here](https://topjohnwu.github.io/Magisk/changes.html)\n</p><p>查看详情：<a href='https://github.com/topjohnwu/Magisk/releases/tag/v30.1'>https://github.com/topjohnwu/Magisk/releases/tag/v30.1</a></p>",
@@ -84,7 +84,7 @@
     {
       "title": "Magisk - Magisk v30.0",
       "category": "刷机资讯",
-      "date": "2026-11-10",
+      "date": "2026-11-11",
       "excerpt": "- [General] Various minor bug fixes\r\n- [Core] Migrate module implementation to Rust\r\n- [Core] Improve Magisk specific fi...",
       "coverSeed": "default",
       "htmlContent": "<p>- [General] Various minor bug fixes\r\n- [Core] Migrate module implementation to Rust\r\n- [Core] Improve Magisk specific files injection logic\r\n- [MagiskBoot] Migrate compression code to Rust\r\n\r\n### Full Changelog: [here](https://topjohnwu.github.io/Magisk/changes.html)</p><p>查看详情：<a href='https://github.com/topjohnwu/Magisk/releases/tag/v30.0'>https://github.com/topjohnwu/Magisk/releases/tag/v30.0</a></p>",
