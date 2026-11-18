@@ -1,32 +1,31 @@
-name: 定时爬取iplaysoft
-concurrency:
-  group: crawl-job
-  cancel-in-progress: true
-
+name: 每日爬虫
 on:
-  workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *' # UTC 0点 = 北京时间8点
+    # UTC 0点 = 北京时间 08:00，按需修改cron
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   crawl:
     runs-on: ubuntu-latest
-    timeout-minutes: 3 # 单个任务最多跑3分钟，卡死自动终止
+    env:
+      PETNEWS_APIKEY: ${{ secrets.PETNEWS_APIKEY }}
     steps:
-      - name: 检出代码
+      - name: 检出仓库
         uses: actions/checkout@v4
-        with:
-          persist-credentials: true
 
       - name: 安装依赖
-        run: pip install requests beautifulsoup4
+        run: pip install requests
 
       - name: 执行爬虫脚本
         run: python crawl.py
 
-      - name: 提交更新文件
+      - name: 提交更新
         run: |
-          git config --global user.name "kingsoftman"
-          git config --global user.email "kingsoftman@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "actions@users.noreply.github.com"
           git add articles.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "自动更新刷机资讯" && git push)
+          git diff --cached --quiet || (git commit -m "更新宠物新闻 $(date -u +%Y-%m-%d)" && git push)
